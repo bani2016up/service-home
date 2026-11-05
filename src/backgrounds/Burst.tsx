@@ -76,8 +76,10 @@ export function Burst({ paused = false }: { paused?: boolean }) {
 
   useEffect(() => {
     const canvas = canvasRef.current;
+    const root = rootRef.current;
     const context = canvas?.getContext('2d');
-    if (!canvas || !context) return;
+    if (!canvas || !context || !root) return;
+    let alive = true;
     let frame = 0;
     let time = 0;
     let previous = 0;
@@ -88,7 +90,7 @@ export function Burst({ paused = false }: { paused?: boolean }) {
 
     const draw = (now: number) => {
       frame = 0;
-      if (!visible || document.hidden) return;
+      if (!alive || !visible || document.hidden) return;
       const delta = Math.min((now - (previous || now)) / 1000, 0.04);
       previous = now;
       const still = pausedRef.current;
@@ -113,11 +115,11 @@ export function Burst({ paused = false }: { paused?: boolean }) {
         }
         context.fill();
       }
-      if (rootRef.current?.dataset.ready !== 'true') rootRef.current!.dataset.ready = 'true';
+      if (root.dataset.ready !== 'true') root.dataset.ready = 'true';
       if (!still) frame = requestAnimationFrame(draw);
     };
     const wake = () => {
-      if (!frame && visible && !document.hidden) {
+      if (alive && !frame && visible && !document.hidden) {
         previous = 0;
         frame = requestAnimationFrame(draw);
       }
@@ -158,6 +160,7 @@ export function Burst({ paused = false }: { paused?: boolean }) {
     document.addEventListener('visibilitychange', onVisibility);
     resize();
     return () => {
+      alive = false;
       cancelAnimationFrame(frame);
       resizeObserver.disconnect();
       intersectionObserver.disconnect();
