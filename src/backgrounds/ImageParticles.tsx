@@ -254,7 +254,7 @@ export function ImageParticles({ src, paused, exposure = 1, dotScale = 1 }: {
 
   return (
     <div className="image-particles" data-state={state}>
-      {state !== 'ready' ? <Burst paused={paused} /> : null}
+      {state === 'fallback' ? <Burst paused={paused} /> : null}
       <canvas ref={canvasRef} />
     </div>
   );

@@ -39,7 +39,7 @@ export function Background({ scene, paused }: { scene: Scene; paused: boolean })
       {scene === 'waves' ? (
         <div className="ambient-scene">
           <SceneFallback paused={paused}>
-            <Suspense fallback={<div className="waves-fallback"><Burst paused={paused} /></div>}>
+            <Suspense fallback={null}>
               <PatternWaves
                 preset="silk"
                 color="#fb8d48"

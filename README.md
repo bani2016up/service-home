@@ -17,14 +17,14 @@ Run `npm run build` to type-check the project and generate the static site in `d
 - **Mountain:** a red-lit mountain cut out from the supplied reference. Increased particle exposure and dot size keep its dark slopes visible.
 - **Alpine collage:** snowy orange-lit mountains, the vertical collage fragment, and its white diamond outline.
 - **Cloud portal:** the red portal and monochrome foreground clouds isolated from the surrounding sky.
-- **Burst:** an original procedural field of 22,000 seeded particles. Seven curved rays combine orange cores, warm tips, and cool blue-violet edges. The field breathes slowly and responds to the pointer with slight depth movement. It also replaces the old terrain in loading and error fallbacks; a static SVG version remains available without Canvas 2D.
+- **Burst:** an original procedural field of 22,000 seeded particles. Seven curved rays combine orange cores, warm tips, and cool blue-violet edges. The field breathes slowly and responds to the pointer with slight depth movement. It also replaces the old terrain in error fallbacks; a static SVG version remains available without Canvas 2D.
 - **Waves:** [React Bits Pattern Waves](https://reactbits.dev/backgrounds/pattern-waves), customized with warm orange tones, pale highlights, and cursor ripples. OGL and the component are loaded only when selected. It requires WebGL 2.
 
 The greeting updates while the page stays open. Motion respects the system's reduced-motion preference and stops while the page is hidden. Particle canvases are capped at 2× device pixel ratio. Point colors are grouped to reduce drawing overhead.
 
 Home and the greeting share one left alignment inside a fixed-width content frame. The text and artwork columns no longer depend on the greeting's length. All six scenes retain the same layout footprint, with individual optical scale and position adjustments. Waves extend across the page behind the same fixed text anchor. On mobile, the text and artwork form one closely spaced stack; the greeting stays on one line.
 
-To try another object, pass a local transparent image URL to `ImageParticles`. A well-lit silhouette and distinct highlights work best. Image loading or sampling failures show Burst instead of an empty scene. There is no public upload interface.
+To try another object, pass a local transparent image URL to `ImageParticles`. A well-lit silhouette and distinct highlights work best. While the chosen image or Waves module loads, its space stays clear so another scene never flashes first. Image loading or sampling failures show Burst instead of an empty scene. There is no public upload interface.
 
 The additional transparent PNGs live in `src/assets/`. Their editing prompts and reference filenames are preserved in [design/image-prompts.md](design/image-prompts.md). The server cutout is retained as an unused source asset; it is excluded from the available scenes and production bundle. Only the selected image is fetched; each new source is approximately 1.7–2.1 MB in this prototype.
 
