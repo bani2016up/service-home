@@ -1,19 +1,17 @@
 import { Component, lazy, Suspense, type ReactNode } from 'react';
 import negroniSource from '../assets/negroni-source.png';
 import mountainSource from '../assets/mountain-cutout.png';
-import serverSource from '../assets/server-cutout.png';
 import alpineSource from '../assets/alpine-cutout.png';
 import portalSource from '../assets/portal-cutout.png';
 import { ImageParticles } from './ImageParticles';
 import { Relief } from './Relief';
 
 const PatternWaves = lazy(() => import('./react-bits/PatternWaves'));
-export const scenes = ['negroni', 'mountain', 'server', 'alpine', 'portal', 'terrain', 'waves'] as const;
+export const scenes = ['negroni', 'mountain', 'alpine', 'portal', 'terrain', 'waves'] as const;
 export type Scene = (typeof scenes)[number];
 export const sceneLabels: Record<Scene, string> = {
   negroni: 'Negroni',
   mountain: 'Mountain',
-  server: 'Server',
   alpine: 'Alpine collage',
   portal: 'Cloud portal',
   terrain: 'Terrain',
@@ -23,7 +21,6 @@ export const sceneLabels: Record<Scene, string> = {
 const imageSources: Partial<Record<Scene, string>> = {
   negroni: negroniSource,
   mountain: mountainSource,
-  server: serverSource,
   alpine: alpineSource,
   portal: portalSource,
 };
