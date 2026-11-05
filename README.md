@@ -14,4 +14,5 @@ Run `npm run build` to type-check the project and generate the static site in `d
 ## Backgrounds
 
 - [Velora UI Grid & Dot Pattern](https://velora.colorlib.com/components/grid-pattern), licensed under [MIT](public/licenses/velora-ui.txt). The two SVG patterns use the app’s CSS.
+- A static SVG point relief layered over the Velora UI dot pattern.
 - [React Bits Ripple Grid](https://reactbits.dev/backgrounds/ripple-grid), licensed under [MIT + Commons Clause](public/licenses/react-bits.md). The animated grid loads only when selected. The static dot pattern stays visible until WebGL is ready and serves as the fallback if WebGL cannot initialize.

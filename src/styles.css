@@ -48,6 +48,23 @@ body {
   stroke: #252525;
 }
 
+.background-with-relief {
+  mask-image: none;
+}
+
+.background-with-relief .background-pattern {
+  mask-image: radial-gradient(ellipse at 75% 75%, #000 4%, transparent 71%);
+}
+
+.background-relief {
+  position: absolute;
+  right: clamp(-130px, -8vw, -50px);
+  bottom: 0;
+  width: clamp(480px, 68vw, 1100px);
+  height: auto;
+  color: #c4c8cd;
+}
+
 .background:has([data-rendering]) .background-pattern {
   visibility: hidden;
 }

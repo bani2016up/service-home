@@ -1,8 +1,9 @@
 import { lazy, Suspense, useState } from 'react';
+import { Relief } from './Relief';
 import { DotPattern, GridPattern } from './velora/GridPattern';
 
 const RippleGrid = lazy(() => import('./react-bits/RippleGrid'));
-const backgrounds = ['dots', 'grid', 'ripple'] as const;
+const backgrounds = ['dots', 'grid', 'relief', 'ripple'] as const;
 
 export function Background() {
   const [background] = useState(() => {
@@ -13,12 +14,13 @@ export function Background() {
   });
 
   return (
-    <div className="background" aria-hidden="true">
+    <div className={background === 'relief' ? 'background background-with-relief' : 'background'} aria-hidden="true">
       {background === 'grid' ? (
         <GridPattern className="background-pattern" width={48} height={48} />
       ) : (
         <DotPattern className="background-pattern" width={23} height={23} cr={0.85} />
       )}
+      {background === 'relief' ? <Relief /> : null}
       {background === 'ripple' ? (
         <Suspense fallback={null}>
           <RippleGrid
