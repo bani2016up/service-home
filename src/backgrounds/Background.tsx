@@ -1,44 +1,17 @@
-import { lazy, Suspense, useState } from 'react';
+import { useState } from 'react';
+import { ObjectFigure } from './ObjectFigure';
 import { Relief } from './Relief';
-import { DotPattern, GridPattern } from './velora/GridPattern';
+import { DotPattern } from './velora/DotPattern';
 
-const RippleGrid = lazy(() => import('./react-bits/RippleGrid'));
-const backgrounds = ['dots', 'grid', 'relief', 'ripple'] as const;
+const figures = ['relief', 'negroni', 'guitar', 'surfboard'] as const;
 
 export function Background() {
-  const [background] = useState(() => {
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-      return 'dots';
-    }
-    return backgrounds[Math.floor(Math.random() * backgrounds.length)];
-  });
+  const [figure] = useState(() => figures[Math.floor(Math.random() * figures.length)]);
 
   return (
-    <div className={background === 'relief' ? 'background background-with-relief' : 'background'} aria-hidden="true">
-      {background === 'grid' ? (
-        <GridPattern className="background-pattern" width={48} height={48} />
-      ) : (
-        <DotPattern className="background-pattern" width={23} height={23} cr={0.85} />
-      )}
-      {background === 'relief' ? <Relief /> : null}
-      {background === 'ripple' ? (
-        <Suspense fallback={null}>
-          <RippleGrid
-            color="#a4a4a4"
-            cellSize={36}
-            lineWidth={0.8}
-            opacity={0.38}
-            glow={0.12}
-            rippleStrength={0.35}
-            rippleSpeed={0.55}
-            rippleInterval={6}
-            intro={false}
-            mouseInteraction={false}
-            clickRipple={false}
-            dpr={1}
-          />
-        </Suspense>
-      ) : null}
+    <div className="background" data-figure={figure} aria-hidden="true">
+      <DotPattern className="background-pattern" width={23} height={23} cr={0.85} />
+      {figure === 'relief' ? <Relief /> : <ObjectFigure figure={figure} />}
     </div>
   );
 }
