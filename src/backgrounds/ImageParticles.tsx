@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { Relief } from './Relief';
+import { Burst } from './Burst';
 
 type Particle = {
   x: number;
@@ -254,7 +254,7 @@ export function ImageParticles({ src, paused, exposure = 1, dotScale = 1 }: {
 
   return (
     <div className="image-particles" data-state={state}>
-      {state !== 'ready' ? <Relief /> : null}
+      {state !== 'ready' ? <Burst paused={paused} /> : null}
       <canvas ref={canvasRef} />
     </div>
   );

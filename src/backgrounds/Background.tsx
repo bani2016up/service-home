@@ -4,19 +4,11 @@ import mountainSource from '../assets/mountain-cutout.png';
 import alpineSource from '../assets/alpine-cutout.png';
 import portalSource from '../assets/portal-cutout.png';
 import { ImageParticles } from './ImageParticles';
-import { Relief } from './Relief';
+import { Burst } from './Burst';
 
 const PatternWaves = lazy(() => import('./react-bits/PatternWaves'));
-export const scenes = ['negroni', 'mountain', 'alpine', 'portal', 'terrain', 'waves'] as const;
+export const scenes = ['negroni', 'mountain', 'alpine', 'portal', 'burst', 'waves'] as const;
 export type Scene = (typeof scenes)[number];
-export const sceneLabels: Record<Scene, string> = {
-  negroni: 'Negroni',
-  mountain: 'Mountain',
-  alpine: 'Alpine collage',
-  portal: 'Cloud portal',
-  terrain: 'Terrain',
-  waves: 'Waves',
-};
 
 const imageSources: Partial<Record<Scene, string>> = {
   negroni: negroniSource,
@@ -25,10 +17,10 @@ const imageSources: Partial<Record<Scene, string>> = {
   portal: portalSource,
 };
 
-class SceneFallback extends Component<{ children: ReactNode }, { failed: boolean }> {
+class SceneFallback extends Component<{ children: ReactNode; paused: boolean }, { failed: boolean }> {
   state = { failed: false };
   static getDerivedStateFromError() { return { failed: true }; }
-  render() { return this.state.failed ? <div className="waves-fallback"><Relief /></div> : this.props.children; }
+  render() { return this.state.failed ? <div className="waves-fallback"><Burst paused={this.props.paused} /></div> : this.props.children; }
 }
 
 export function Background({ scene, paused }: { scene: Scene; paused: boolean }) {
@@ -43,11 +35,11 @@ export function Background({ scene, paused }: { scene: Scene; paused: boolean })
           dotScale={scene === 'mountain' ? 1.25 : 1}
         />
       ) : null}
-      {scene === 'terrain' ? <Relief /> : null}
+      {scene === 'burst' ? <Burst paused={paused} /> : null}
       {scene === 'waves' ? (
         <div className="ambient-scene">
-          <SceneFallback>
-            <Suspense fallback={<div className="waves-fallback"><Relief /></div>}>
+          <SceneFallback paused={paused}>
+            <Suspense fallback={<div className="waves-fallback"><Burst paused={paused} /></div>}>
               <PatternWaves
                 preset="silk"
                 color="#fb8d48"
