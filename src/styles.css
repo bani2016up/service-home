@@ -1,0 +1,100 @@
+:root {
+  color-scheme: dark;
+  background: #090909;
+  color: #f2f2f2;
+  font-family: system-ui, -apple-system, sans-serif;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+}
+
+body {
+  margin: 0;
+}
+
+.home {
+  --page-gutter: clamp(24px, 5vw, 76px);
+  position: relative;
+  isolation: isolate;
+  box-sizing: border-box;
+  min-height: 100vh;
+  min-height: 100svh;
+  display: grid;
+  align-items: center;
+  padding: 96px var(--page-gutter);
+}
+
+.background {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  pointer-events: none;
+  mask-image: radial-gradient(ellipse at 74% 54%, #000 8%, transparent 79%);
+}
+
+.background-pattern {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.background-pattern[data-slot='dot-pattern'] {
+  fill: #383838;
+}
+
+.background-pattern[data-slot='grid-pattern'] {
+  stroke: #252525;
+}
+
+.background:has([data-rendering]) .background-pattern {
+  visibility: hidden;
+}
+
+.home-label {
+  position: absolute;
+  inset: clamp(24px, 4vw, 46px) auto auto var(--page-gutter);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.8125rem;
+  color: #a5a5a5;
+}
+
+.home-mark {
+  display: grid;
+  grid-template-columns: repeat(2, 4px);
+  gap: 2px;
+}
+
+.home-mark i {
+  height: 4px;
+  background: #a5a5a5;
+}
+
+.home-mark i:last-child {
+  background: #545454;
+}
+
+.welcome {
+  box-sizing: border-box;
+  width: min(100%, 42rem);
+  margin-inline: auto;
+}
+
+.welcome h1 {
+  margin: 0;
+  font-size: clamp(2.25rem, 6vw, 4rem);
+  font-weight: 500;
+  line-height: 1.05;
+  letter-spacing: -0.065em;
+  text-wrap: balance;
+}
+
+.welcome p {
+  margin: 16px 0 0;
+  font-size: 0.9375rem;
+  line-height: 1.5;
+  color: #a5a5a5;
+}
