@@ -57,6 +57,7 @@ body {
   width: clamp(180px, 30vw, 440px);
   max-width: 68vw;
   max-height: 42%;
+  object-fit: contain;
   color: #c4c8cd;
 }
 

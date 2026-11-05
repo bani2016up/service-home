@@ -14,3 +14,5 @@ Run `npm run build` to type-check the project and generate the static site in `d
 ## Background
 
 [Velora UI Dot Pattern](https://velora.colorlib.com/components/grid-pattern), licensed under [MIT](public/licenses/velora-ui.txt), provides the backdrop behind the four SVG figures.
+
+The Negroni is generated from 3D geometry with [Three.js MeshSurfaceSampler](https://threejs.org/docs/pages/MeshSurfaceSampler.html). The development and build commands generate its SVG automatically. To regenerate the artwork on its own, run `npm run generate:negroni`.

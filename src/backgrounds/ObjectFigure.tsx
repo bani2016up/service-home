@@ -2,21 +2,6 @@ import { useId } from 'react';
 
 type DrawingProps = { texture: string };
 
-function Negroni({ texture }: DrawingProps) {
-  return (
-    <>
-      <path fill={texture} d="M69 116Q150 151 231 116L218 218Q150 248 82 218Z" />
-      <path fill={texture} d="M112 121L100 94L124 73L169 79L187 104L165 132Z" />
-      <path className="object-detail" d="M100 94L144 100L169 79M144 100L165 132M112 121L144 100" />
-      <path className="object-highlight" fill={texture} d="M175 111C175 72 202 46 238 52C243 83 213 110 175 111Z" />
-      <path className="object-detail" d="M179 105L206 61M179 105L224 62M179 105L232 75M179 105L221 90" />
-      <path d="M69 116L82 218C83 233 110 242 150 242S217 233 218 218L231 116" />
-      <path className="object-highlight" d="M69 116C69 130 105 141 150 141S231 130 231 116M175 96C152 93 69 96 69 116M231 116C231 108 223 103 213 101" />
-      <path className="object-detail" d="M83 215Q150 238 217 215M78 146L89 207M222 145L211 209M95 160L101 211" />
-    </>
-  );
-}
-
 function Guitar({ texture }: DrawingProps) {
   return (
     <g transform="rotate(37 150 144)">
@@ -50,7 +35,6 @@ function Surfboard({ texture }: DrawingProps) {
 }
 
 const drawings = {
-  negroni: Negroni,
   guitar: Guitar,
   surfboard: Surfboard,
 };
