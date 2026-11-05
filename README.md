@@ -1,6 +1,6 @@
 # Service Home
 
-A minimal personal homepage with a greeting based on the visitor's local time. A random scene appears on each visit. The footer lets visitors choose Negroni, Terrain, or Waves and pause animation.
+A minimal personal homepage with a greeting based on the visitor's local time. A random scene appears on each visit. The footer offers seven scenes through a compact selector, previous/next buttons, and an animation pause button. Orange is the shared interface accent.
 
 ## Development
 
@@ -14,12 +14,20 @@ Run `npm run build` to type-check the project and generate the static site in `d
 ## Scenes
 
 - **Negroni:** an original image-to-particle renderer. `ImageParticles` samples the source image's alpha, brightness, and color on a 176 × 176 grid. The current image produces about 15,000 points. They assemble on entry, drift gently, respond to the pointer, and spring back into place. Clicking the object adds a stronger impulse. Brightness supplies a small depth offset; this is a 2D image with simulated depth, not a rotatable 3D model.
+- **Mountain:** a red-lit mountain cut out from the supplied reference. Increased particle exposure and dot size keep its dark slopes visible.
+- **Server:** a cutout of the NASA-themed miniature server rack, including the front patch cables and top handles.
+- **Alpine collage:** snowy orange-lit mountains, the vertical collage fragment, and its white diamond outline.
+- **Cloud portal:** the red portal and monochrome foreground clouds isolated from the surrounding sky.
 - **Terrain:** the original procedural mountain relief, preserved as a quiet static option and a fallback for loading or unavailable rendering.
-- **Waves:** [React Bits Pattern Waves](https://reactbits.dev/backgrounds/pattern-waves), customized with a muted lavender tint and cursor ripples. OGL and the component are loaded only when selected. It requires WebGL 2.
+- **Waves:** [React Bits Pattern Waves](https://reactbits.dev/backgrounds/pattern-waves), customized with warm orange tones, pale highlights, and cursor ripples. OGL and the component are loaded only when selected. It requires WebGL 2.
 
 The greeting updates while the page stays open. Motion respects the system's reduced-motion preference, can be paused manually, and stops while the page is hidden. The Negroni canvas is capped at 2× device pixel ratio. Its point colors are grouped to reduce drawing overhead.
 
-To try another object, pass a local transparent image URL to `ImageParticles`. A well-lit silhouette and distinct highlights work best. Image loading or sampling failures show the mountain instead of an empty scene. There is no public upload interface.
+All seven scenes retain the same grid footprint. Waves extend across the page inside that footprint, so switching scenes does not move the greeting on desktop or mobile.
+
+To try another object, pass a local transparent image URL to `ImageParticles`. A well-lit silhouette and distinct highlights work best. Image loading or sampling failures show Terrain instead of an empty scene. There is no public upload interface.
+
+The four additional transparent PNGs live in `src/assets/`. Their editing prompts and reference filenames are preserved in [design/image-prompts.md](design/image-prompts.md). Only the selected image is fetched; each new source is approximately 1.7–2.1 MB in this prototype.
 
 ## Library comparison
 

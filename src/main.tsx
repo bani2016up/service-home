@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { createRoot } from 'react-dom/client';
-import { Background, scenes, type Scene } from './backgrounds/Background';
+import { Background, scenes, sceneLabels, type Scene } from './backgrounds/Background';
 import './styles.css';
 
 function greetingForHour(hour: number) {
@@ -9,8 +9,6 @@ function greetingForHour(hour: number) {
   if (hour < 18) return 'Good afternoon.';
   return 'Good evening.';
 }
-
-const sceneLabels: Record<Scene, string> = { negroni: 'Negroni', terrain: 'Terrain', waves: 'Waves' };
 
 function Home() {
   const [scene, setScene] = useState<Scene>(() => scenes[Math.floor(Math.random() * scenes.length)]);
@@ -37,6 +35,9 @@ function Home() {
   }, []);
 
   const motionPaused = paused || reducedMotion;
+  const moveScene = (direction: number) => setScene(current =>
+    scenes[(scenes.indexOf(current) + direction + scenes.length) % scenes.length],
+  );
   return (
     <div className="home" data-scene={scene}>
       <header className="home-label">
@@ -55,12 +56,20 @@ function Home() {
           {scene === 'terrain' || motionPaused ? 'A little space for what’s next.' : 'Move your cursor. See what happens.'}
         </span>
         <div className="scene-controls">
-          <div className="scene-switcher" role="group" aria-label="Choose a scene">
-            {scenes.map(name => (
-              <button type="button" key={name} aria-pressed={scene === name} onClick={() => setScene(name)}>
-                <span className="scene-dot" aria-hidden="true" />{sceneLabels[name]}
-              </button>
-            ))}
+          <div className="scene-switcher" role="group" aria-label="Scene navigation">
+            <button type="button" className="scene-step" aria-label="Previous scene" onClick={() => moveScene(-1)}>
+              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" aria-hidden="true"><path d="m9.5 4-4 4 4 4" /></svg>
+            </button>
+            <div className="scene-picker">
+              <span className="scene-dot" aria-hidden="true" />
+              <select aria-label="Choose a scene" value={scene} onChange={event => setScene(event.target.value as Scene)}>
+                {scenes.map(name => <option key={name} value={name}>{sceneLabels[name]}</option>)}
+              </select>
+              <svg className="picker-chevron" viewBox="0 0 16 16" fill="none" stroke="currentColor" aria-hidden="true"><path d="m5 6.5 3 3 3-3" /></svg>
+            </div>
+            <button type="button" className="scene-step" aria-label="Next scene" onClick={() => moveScene(1)}>
+              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" aria-hidden="true"><path d="m6.5 4 4 4-4 4" /></svg>
+            </button>
           </div>
           <button
             type="button"

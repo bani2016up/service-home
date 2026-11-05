@@ -20,7 +20,7 @@ function noise(x: number, y: number) {
   return value - Math.floor(value);
 }
 
-function sampleImage(image: HTMLImageElement): ParticleGroup[] {
+function sampleImage(image: HTMLImageElement, exposure: number): ParticleGroup[] {
   const resolution = 176;
   const sampler = document.createElement('canvas');
   sampler.width = sampler.height = resolution;
@@ -37,9 +37,9 @@ function sampleImage(image: HTMLImageElement): ParticleGroup[] {
     for (let x = 0; x < resolution; x++) {
       const index = (y * resolution + x) * 4;
       const alpha = data[index + 3] / 255;
-      const red = data[index] / 255;
-      const green = data[index + 1] / 255;
-      const blue = data[index + 2] / 255;
+      const red = Math.min(1, data[index] / 255 * exposure);
+      const green = Math.min(1, data[index + 1] / 255 * exposure);
+      const blue = Math.min(1, data[index + 2] / 255 * exposure);
       const luminance = red * 0.2126 + green * 0.7152 + blue * 0.0722;
       const energy = luminance * 0.45 + Math.max(red, green, blue) * 0.55;
       const seed = noise(x, y);
@@ -73,7 +73,12 @@ function sampleImage(image: HTMLImageElement): ParticleGroup[] {
   return Array.from(groups, ([color, particles]) => ({ color, particles }));
 }
 
-export function ImageParticles({ src, paused }: { src: string; paused: boolean }) {
+export function ImageParticles({ src, paused, exposure = 1, dotScale = 1 }: {
+  src: string;
+  paused: boolean;
+  exposure?: number;
+  dotScale?: number;
+}) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const pausedRef = useRef(paused);
   const wakeRef = useRef<(() => void) | null>(null);
@@ -150,7 +155,7 @@ export function ImageParticles({ src, paused }: { src: string; paused: boolean }
           const shimmer = Math.sin(time * 0.65 + point.phase);
           const x = targetX + point.driftX * size * settle + point.offsetX + pointer.tiltX * point.depth + shimmer * 0.65;
           const y = targetY + point.driftY * size * settle + point.offsetY + pointer.tiltY * point.depth + Math.cos(time * 0.5 + point.phase) * 0.8;
-          const radius = point.radius * size * (1 + shimmer * 0.1);
+          const radius = point.radius * size * dotScale * (1 + shimmer * 0.1);
           context!.moveTo(x + radius, y);
           context!.arc(x, y, radius, 0, Math.PI * 2);
         }
@@ -200,7 +205,7 @@ export function ImageParticles({ src, paused }: { src: string; paused: boolean }
     image.onload = () => {
       if (!alive) return;
       try {
-        groups = sampleImage(image);
+        groups = sampleImage(image, exposure);
         if (!groups.length) throw new Error('No visible image samples');
         canvas.dataset.particles = String(groups.reduce((total, group) => total + group.particles.length, 0));
         resize();
@@ -245,7 +250,7 @@ export function ImageParticles({ src, paused }: { src: string; paused: boolean }
       image.onload = image.onerror = null;
       wakeRef.current = null;
     };
-  }, [src]);
+  }, [src, exposure, dotScale]);
 
   return (
     <div className="image-particles" data-state={state}>
