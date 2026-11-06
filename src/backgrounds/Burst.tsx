@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react';
+import { buildFieldParticles, createImageField, drawField, type FieldGroup, type ImageField } from './imageField';
 
 type Point = { x: number; y: number; depth: number; radius: number; phase: number };
 type PointGroup = { color: string; points: Point[]; path: string };
@@ -63,9 +64,37 @@ function makeBurst(): PointGroup[] {
 // Seeded once: the grain stays coherent instead of flickering between frames.
 const groups = makeBurst();
 
-export function Burst({ paused = false }: { paused?: boolean }) {
+let cachedField: ImageField | undefined;
+function sampleBurst() {
+  if (cachedField) return cachedField;
+  const resolution = 176;
+  const sampler = document.createElement('canvas');
+  sampler.width = sampler.height = resolution;
+  const context = sampler.getContext('2d', { willReadFrequently: true });
+  if (!context) return null;
+  // Rasterize the existing points only for color and silhouette sampling.
+  // The visible burst retains its original geometry and animation.
+  for (const group of groups) {
+    context.fillStyle = group.color;
+    context.beginPath();
+    for (const point of group.points) {
+      const breathe = 1 + Math.sin(point.phase) * 0.018;
+      const x = ((point.x - 0.5) * breathe + 0.5) * resolution;
+      const y = ((point.y - 0.5) * breathe + 0.5) * resolution;
+      const radius = Math.max(0.65, point.radius * resolution);
+      context.moveTo(x + radius, y);
+      context.arc(x, y, radius, 0, Math.PI * 2);
+    }
+    context.fill();
+  }
+  cachedField = createImageField(context.getImageData(0, 0, resolution, resolution).data, resolution);
+  return cachedField;
+}
+
+export function Burst({ paused = false, atmosphere = false }: { paused?: boolean; atmosphere?: boolean }) {
   const rootRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const fieldCanvasRef = useRef<HTMLCanvasElement>(null);
   const pausedRef = useRef(paused);
   const wakeRef = useRef<(() => void) | null>(null);
 
@@ -79,6 +108,14 @@ export function Burst({ paused = false }: { paused?: boolean }) {
     const root = rootRef.current;
     const context = canvas?.getContext('2d');
     if (!canvas || !context || !root) return;
+    const fieldCanvas = fieldCanvasRef.current;
+    const fieldContext = fieldCanvas?.getContext('2d');
+    let field: ImageField | null = null;
+    try { if (fieldContext) field = sampleBurst(); } catch { /* Keep the original burst if sampling is unavailable. */ }
+    let fieldGroups: FieldGroup[] = [];
+    let fieldWidth = 1;
+    let fieldHeight = 1;
+    let lastFieldFrame = 0;
     let alive = true;
     let frame = 0;
     let time = 0;
@@ -101,6 +138,10 @@ export function Burst({ paused = false }: { paused?: boolean }) {
       const size = Math.min(width, height);
       const originX = (width - size) / 2;
       const originY = (height - size) / 2;
+      if (fieldContext && field && (still || !lastFieldFrame || now - lastFieldFrame >= 32)) {
+        drawField(fieldContext, fieldGroups, fieldWidth, fieldHeight, time);
+        lastFieldFrame = now;
+      }
       context.clearRect(0, 0, width, height);
       for (const group of groups) {
         context.fillStyle = group.color;
@@ -125,12 +166,34 @@ export function Burst({ paused = false }: { paused?: boolean }) {
       }
     };
     const resize = () => {
+      if (!alive) return;
       width = Math.max(1, canvas.clientWidth);
       height = Math.max(1, canvas.clientHeight);
       const dpr = Math.min(window.devicePixelRatio || 1, 2);
       canvas.width = Math.round(width * dpr);
       canvas.height = Math.round(height * dpr);
       context.setTransform(dpr, 0, 0, dpr, 0, 0);
+      if (fieldCanvas && fieldContext && field) {
+        const fieldRect = fieldCanvas.getBoundingClientRect();
+        const artwork = canvas.getBoundingClientRect();
+        const size = Math.min(artwork.width, artwork.height);
+        fieldWidth = Math.max(1, fieldRect.width);
+        fieldHeight = Math.max(1, fieldRect.height);
+        fieldCanvas.width = Math.round(fieldWidth * dpr);
+        fieldCanvas.height = Math.round(fieldHeight * dpr);
+        fieldContext.setTransform(dpr, 0, 0, dpr, 0, 0);
+        const quietZones = Array.from(root.closest('.home')?.querySelectorAll('.welcome-copy, .home-label') ?? []).map(element => {
+          const box = element.getBoundingClientRect();
+          return { x: box.left - fieldRect.left, y: box.top - fieldRect.top, width: box.width, height: box.height };
+        });
+        fieldGroups = buildFieldParticles(field, { x: 0, y: 0, width: fieldWidth, height: fieldHeight }, {
+          x: artwork.left - fieldRect.left + (artwork.width - size) / 2,
+          y: artwork.top - fieldRect.top + (artwork.height - size) / 2,
+          width: size, height: size,
+        }, quietZones, fieldWidth < 900 ? 8500 : 18000);
+        fieldCanvas.dataset.particles = String(fieldGroups.reduce((count, group) => count + group.points.length, 0));
+        lastFieldFrame = 0;
+      }
       wake();
     };
     const onPointer = (event: PointerEvent) => {
@@ -153,7 +216,10 @@ export function Burst({ paused = false }: { paused?: boolean }) {
       else { cancelAnimationFrame(frame); frame = 0; }
     });
     resizeObserver.observe(canvas);
-    intersectionObserver.observe(canvas);
+    if (fieldCanvas) resizeObserver.observe(fieldCanvas);
+    const copy = root.closest('.home')?.querySelector('.welcome-copy');
+    if (fieldCanvas && copy) resizeObserver.observe(copy);
+    intersectionObserver.observe(fieldCanvas ?? canvas);
     wakeRef.current = wake;
     window.addEventListener('pointermove', onPointer, { passive: true });
     window.addEventListener('blur', onLeave);
@@ -169,9 +235,9 @@ export function Burst({ paused = false }: { paused?: boolean }) {
       document.removeEventListener('visibilitychange', onVisibility);
       wakeRef.current = null;
     };
-  }, []);
+  }, [atmosphere]);
 
-  return (
+  const artwork = (
     <div className="burst-scene" ref={rootRef}>
       <svg className="burst-fallback" viewBox="0 0 1000 1000" fill="none" strokeWidth="2" strokeLinecap="round">
         {groups.map(group => <path key={group.color} d={group.path} stroke={group.color} />)}
@@ -179,4 +245,10 @@ export function Burst({ paused = false }: { paused?: boolean }) {
       <canvas ref={canvasRef} />
     </div>
   );
+  return atmosphere ? (
+    <div className="burst-with-atmosphere">
+      <canvas className="burst-atmosphere" ref={fieldCanvasRef} />
+      {artwork}
+    </div>
+  ) : artwork;
 }

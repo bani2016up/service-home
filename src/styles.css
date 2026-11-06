@@ -114,6 +114,10 @@ body { margin: 0; }
 .burst-fallback { width: 100%; height: 100%; }
 .burst-scene[data-ready="true"] > .burst-fallback { display: none; }
 .burst-scene:not([data-ready="true"]) > canvas { position: absolute; inset: 0; }
+.background[data-scene="burst"] { position: static; }
+.burst-with-atmosphere { height: 100%; }
+.burst-with-atmosphere > .burst-scene { position: relative; z-index: 0; height: 100%; }
+.burst-atmosphere { position: absolute; inset: 0; display: block; width: 100%; height: 100%; pointer-events: none; }
 /* Waves surround the same fixed text anchor used by the object scenes. */
 .background[data-scene="waves"] { position: static; }
 .ambient-scene {

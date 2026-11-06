@@ -41,7 +41,7 @@ export function Background({ scene, paused, onPaletteReady }: {
           onPaletteReady={onPaletteReady}
         />
       ) : null}
-      {scene === 'burst' ? <Burst paused={paused} /> : null}
+      {scene === 'burst' ? <Burst paused={paused} atmosphere /> : null}
       {scene === 'waves' ? (
         <div className="ambient-scene">
           <SceneFallback paused={paused}>

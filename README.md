@@ -36,6 +36,8 @@ Outside the object, coherent waves carry its palette. Within 20% of the displaye
 
 The atmosphere and object become visible together after the chosen source loads. Header and copy regions soften the field to retain legibility, including on the shared authentication pages. Geometry is prepared on load and resize; the field updates at up to 30 fps while the object's pointer response retains its existing frame rate. The atmospheric budget is capped at 18,000 points on desktop and 8,500 on narrow layouts. No additional dependency, image asset, or WebGL requirement is introduced.
 
+The procedural Burst scene uses the same atmosphere. Its existing points are sampled once into a small transparent canvas to derive colors and a silhouette; the visible geometry and animation remain procedural. The surrounding field follows the rays and central opening, using the same transition width, quiet regions, and particle budgets. Burst instances used as error fallbacks retain their original compact rendering.
+
 Run `npm run check:field` for silhouette, concavity, color-continuation, transparent-pixel, deterministic-grain, particle-budget, motion-falloff, and text-region checks.
 
 Home and the greeting share one left alignment inside a fixed-width content frame. The text and artwork columns no longer depend on the greeting's length. All six scenes retain the same layout footprint, with individual optical scale and position adjustments. Waves extend across the page behind the same fixed text anchor. On mobile, the text and artwork form one closely spaced stack; the greeting stays on one line.
