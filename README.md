@@ -4,6 +4,8 @@ A minimal personal homepage with a greeting based on the visitor's local time an
 
 The header links to the private monitoring page at `https://status.prfnv.com/`. Access is restricted by server-side Google authentication.
 
+The authentication fallback lives in `public/auth-required.html` and ships in `dist/` with each build. It shares the homepage's typography, colors, and content alignment, and works without JavaScript. Nginx serves it internally with HTTP 401 for protected requests. Its `/sign-in` link is a public Nginx endpoint that starts Google login and returns to the protected page for the current host. The HTML page itself does not grant access.
+
 ## Development
 
 Use Node.js 20.19 or later in the 20.x release line, or Node.js 22.12 or later.
