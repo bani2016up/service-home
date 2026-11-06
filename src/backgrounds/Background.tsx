@@ -5,6 +5,7 @@ import alpineSource from '../assets/alpine-cutout.png';
 import portalSource from '../assets/portal-cutout.png';
 import { ImageParticles } from './ImageParticles';
 import { Burst } from './Burst';
+import type { Color } from './imageField';
 
 const PatternWaves = lazy(() => import('./react-bits/PatternWaves'));
 export const scenes = ['negroni', 'mountain', 'alpine', 'portal', 'burst', 'waves'] as const;
@@ -23,7 +24,11 @@ class SceneFallback extends Component<{ children: ReactNode; paused: boolean }, 
   render() { return this.state.failed ? <div className="waves-fallback"><Burst paused={this.props.paused} /></div> : this.props.children; }
 }
 
-export function Background({ scene, paused }: { scene: Scene; paused: boolean }) {
+export function Background({ scene, paused, onPaletteReady }: {
+  scene: Scene;
+  paused: boolean;
+  onPaletteReady?: (palette: Color[] | null) => void;
+}) {
   const source = imageSources[scene];
   return (
     <div className="background" data-scene={scene} data-image={source ? 'true' : undefined} aria-hidden="true">
@@ -33,6 +38,7 @@ export function Background({ scene, paused }: { scene: Scene; paused: boolean })
           paused={paused}
           exposure={scene === 'mountain' ? 1.65 : 1}
           dotScale={scene === 'mountain' ? 1.25 : 1}
+          onPaletteReady={onPaletteReady}
         />
       ) : null}
       {scene === 'burst' ? <Burst paused={paused} /> : null}

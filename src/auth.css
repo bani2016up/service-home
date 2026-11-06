@@ -1,5 +1,6 @@
 @import './styles.css';
 
+.auth-page { --scene-accent: #b8afa4; }
 .auth-page .home-label { min-height: 44px; }
 .home-link {
   display: inline-flex;
@@ -20,16 +21,24 @@
   min-height: 48px;
   margin-top: 32px;
   padding: 12px 20px;
+  border: 1px solid color-mix(in srgb, var(--scene-accent) 28%, transparent);
   border-radius: 6px;
-  background: #fb8d48;
-  color: #090909;
+  background: transparent;
+  color: var(--scene-accent);
   font-size: 15px;
   line-height: 24px;
   text-decoration: none;
+  transition: color 180ms ease-out, border-color 180ms ease-out, background-color 180ms ease-out;
 }
-.sign-in:hover { background: #ffa466; }
-.sign-in:active { background: #ed7b37; }
-.auth-page a:focus-visible { outline: 2px solid #fb8d48; outline-offset: 5px; }
+.sign-in:hover {
+  border-color: color-mix(in srgb, var(--scene-accent) 58%, transparent);
+  background: color-mix(in srgb, var(--scene-accent) 5%, transparent);
+}
+.sign-in:active { background: color-mix(in srgb, var(--scene-accent) 9%, transparent); }
+.auth-page a:focus-visible { outline: 2px solid var(--scene-accent); outline-offset: 5px; }
+@media (prefers-reduced-motion: reduce) {
+  .sign-in { transition: none; }
+}
 @media (max-width: 900px) {
   .sign-in { margin-top: 28px; }
 }

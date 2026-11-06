@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { Burst } from './Burst';
-import { buildFieldParticles, createImageField, drawField, noise, type FieldGroup, type ImageField } from './imageField';
+import { buildFieldParticles, createImageField, drawField, noise, type Color, type FieldGroup, type ImageField } from './imageField';
 
 type Particle = {
   x: number;
@@ -71,11 +71,12 @@ function sampleImage(image: HTMLImageElement, exposure: number) {
   };
 }
 
-export function ImageParticles({ src, paused, exposure = 1, dotScale = 1 }: {
+export function ImageParticles({ src, paused, exposure = 1, dotScale = 1, onPaletteReady }: {
   src: string;
   paused: boolean;
   exposure?: number;
   dotScale?: number;
+  onPaletteReady?: (palette: Color[] | null) => void;
 }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const fieldCanvasRef = useRef<HTMLCanvasElement>(null);
@@ -95,6 +96,7 @@ export function ImageParticles({ src, paused, exposure = 1, dotScale = 1 }: {
     const context = canvas.getContext('2d');
     const fieldContext = fieldCanvas.getContext('2d');
     if (!context) {
+      onPaletteReady?.(null);
       setState('fallback');
       return;
     }
@@ -243,14 +245,21 @@ export function ImageParticles({ src, paused, exposure = 1, dotScale = 1 }: {
         if (!groups.length) throw new Error('No visible image samples');
         canvas.dataset.particles = String(groups.reduce((total, group) => total + group.particles.length, 0));
         resize();
+        onPaletteReady?.(field.palette);
         setState('ready');
       } catch {
         groups = [];
         fieldGroups = [];
+        onPaletteReady?.(null);
         setState('fallback');
       }
     };
-    image.onerror = () => { if (alive) setState('fallback'); };
+    image.onerror = () => {
+      if (alive) {
+        onPaletteReady?.(null);
+        setState('fallback');
+      }
+    };
     image.src = src;
     setState('loading');
     wakeRef.current = wake;
@@ -289,7 +298,7 @@ export function ImageParticles({ src, paused, exposure = 1, dotScale = 1 }: {
       image.onload = image.onerror = null;
       wakeRef.current = null;
     };
-  }, [src, exposure, dotScale]);
+  }, [src, exposure, dotScale, onPaletteReady]);
 
   return (
     <div className="image-particles" data-state={state}>
