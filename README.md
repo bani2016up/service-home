@@ -4,7 +4,9 @@ A minimal personal homepage with a greeting based on the visitor's local time an
 
 The header links to the private monitoring page at `https://status.prfnv.com/`. Access is restricted by server-side Google authentication.
 
-The authentication fallback lives in `public/auth-required.html` and ships in `dist/` with each build. It shares the homepage's typography, colors, and content alignment, and works without JavaScript. Nginx serves it internally with HTTP 401 for protected requests. Its `/sign-in` link is a public Nginx endpoint that starts Google login and returns to the protected page for the current host. The HTML page itself does not grant access.
+The authentication pages live in `auth-required.html`, `auth-denied.html`, and `auth-error.html`. They share the homepage's styles and `Background` component, including random scenes, animation, and reduced-motion handling. Their text and sign-in links remain usable without JavaScript.
+
+Vite builds all four pages together. Public scripts, styles, and images are emitted under `/landing-assets/`, separate from protected applications' assets. Nginx must serve that directory before authentication on each host and permit same-origin scripts, styles, images, and connections in the authentication pages' CSP. It serves the HTML pages internally, preserving HTTP 401, 403, or the original server error status. OAuth upstream errors use `proxy_intercept_errors` and `error_page` without exposing protected routes. The public `/sign-in` endpoint starts a new Google login with a fixed return target. The HTML pages never grant access.
 
 ## Development
 

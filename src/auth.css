@@ -1,0 +1,35 @@
+@import './styles.css';
+
+.auth-page .home-label { min-height: 44px; }
+.home-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 44px;
+  color: inherit;
+  text-decoration: none;
+}
+.home-link:hover { color: #f4f1ec; }
+.auth-page .welcome-copy { pointer-events: auto; }
+.auth-page .welcome h1 { width: auto; white-space: normal; }
+#auth-background { display: contents; }
+.sign-in {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 48px;
+  margin-top: 32px;
+  padding: 12px 20px;
+  border-radius: 6px;
+  background: #fb8d48;
+  color: #090909;
+  font-size: 15px;
+  line-height: 24px;
+  text-decoration: none;
+}
+.sign-in:hover { background: #ffa466; }
+.sign-in:active { background: #ed7b37; }
+.auth-page a:focus-visible { outline: 2px solid #fb8d48; outline-offset: 5px; }
+@media (max-width: 900px) {
+  .sign-in { margin-top: 28px; }
+}

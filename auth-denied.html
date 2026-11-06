@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#090909" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>Access denied · Home</title>
+    <link rel="stylesheet" href="/src/auth.css" />
+  </head>
+  <body>
+    <div class="home auth-page">
+      <header class="home-label">
+        <a class="home-link" href="https://www.prfnv.com/">
+          <span class="home-mark" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
+          Home
+        </a>
+      </header>
+      <main class="welcome">
+        <div class="welcome-copy">
+          <h1>No access.</h1>
+          <p>Sign in with an approved Google account to continue.</p>
+          <a class="sign-in" href="/sign-in">Use another Google account</a>
+        </div>
+        <div id="auth-background" aria-hidden="true"></div>
+      </main>
+    </div>
+    <script type="module" src="/src/auth-background.tsx"></script>
+  </body>
+</html>
