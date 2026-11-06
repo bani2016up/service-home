@@ -26,7 +26,7 @@ class SceneFallback extends Component<{ children: ReactNode; paused: boolean }, 
 export function Background({ scene, paused }: { scene: Scene; paused: boolean }) {
   const source = imageSources[scene];
   return (
-    <div className="background" data-scene={scene} aria-hidden="true">
+    <div className="background" data-scene={scene} data-image={source ? 'true' : undefined} aria-hidden="true">
       {source ? (
         <ImageParticles
           src={source}

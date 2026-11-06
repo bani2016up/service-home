@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { Burst } from './Burst';
+import { buildFieldParticles, createImageField, drawField, noise, type FieldGroup, type ImageField } from './imageField';
 
 type Particle = {
   x: number;
@@ -14,13 +15,7 @@ type Particle = {
 };
 type ParticleGroup = { color: string; particles: Particle[] };
 
-// A stable distribution keeps the image from sparkling randomly between frames.
-function noise(x: number, y: number) {
-  const value = Math.sin(x * 127.1 + y * 311.7) * 43758.5453;
-  return value - Math.floor(value);
-}
-
-function sampleImage(image: HTMLImageElement, exposure: number): ParticleGroup[] {
+function sampleImage(image: HTMLImageElement, exposure: number) {
   const resolution = 176;
   const sampler = document.createElement('canvas');
   sampler.width = sampler.height = resolution;
@@ -70,7 +65,10 @@ function sampleImage(image: HTMLImageElement, exposure: number): ParticleGroup[]
       });
     }
   }
-  return Array.from(groups, ([color, particles]) => ({ color, particles }));
+  return {
+    groups: Array.from(groups, ([color, particles]) => ({ color, particles })),
+    field: createImageField(data, resolution, exposure),
+  };
 }
 
 export function ImageParticles({ src, paused, exposure = 1, dotScale = 1 }: {
@@ -80,6 +78,7 @@ export function ImageParticles({ src, paused, exposure = 1, dotScale = 1 }: {
   dotScale?: number;
 }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const fieldCanvasRef = useRef<HTMLCanvasElement>(null);
   const pausedRef = useRef(paused);
   const wakeRef = useRef<(() => void) | null>(null);
   const [state, setState] = useState<'loading' | 'ready' | 'fallback'>('loading');
@@ -91,8 +90,10 @@ export function ImageParticles({ src, paused, exposure = 1, dotScale = 1 }: {
 
   useEffect(() => {
     const canvas = canvasRef.current;
-    if (!canvas) return;
+    const fieldCanvas = fieldCanvasRef.current;
+    if (!canvas || !fieldCanvas) return;
     const context = canvas.getContext('2d');
+    const fieldContext = fieldCanvas.getContext('2d');
     if (!context) {
       setState('fallback');
       return;
@@ -100,6 +101,11 @@ export function ImageParticles({ src, paused, exposure = 1, dotScale = 1 }: {
     let alive = true;
     let visible = true;
     let groups: ParticleGroup[] = [];
+    let field: ImageField | null = null;
+    let fieldGroups: FieldGroup[] = [];
+    let fieldWidth = 1;
+    let fieldHeight = 1;
+    let lastFieldFrame = 0;
     let frameId = 0;
     let width = 1;
     let height = 1;
@@ -128,6 +134,11 @@ export function ImageParticles({ src, paused, exposure = 1, dotScale = 1 }: {
       pointer.tiltY += (targetTiltY - pointer.tiltY) * smoothing;
       burst *= Math.exp(-delta * 4);
       context!.clearRect(0, 0, width, height);
+      // The slow field updates at 30 fps; pointer response on the object keeps its own frame rate.
+      if (fieldContext && (still || now - lastFieldFrame >= 32 || !lastFieldFrame)) {
+        drawField(fieldContext, fieldGroups, fieldWidth, fieldHeight, time);
+        lastFieldFrame = now;
+      }
 
       const interactionRadius = size * 0.2;
       for (const group of groups) {
@@ -171,6 +182,7 @@ export function ImageParticles({ src, paused, exposure = 1, dotScale = 1 }: {
       }
     }
     const resize = () => {
+      if (!alive) return;
       const rect = canvas.getBoundingClientRect();
       width = Math.max(1, rect.width);
       height = Math.max(1, rect.height);
@@ -178,6 +190,26 @@ export function ImageParticles({ src, paused, exposure = 1, dotScale = 1 }: {
       canvas.width = Math.round(width * dpr);
       canvas.height = Math.round(height * dpr);
       context.setTransform(dpr, 0, 0, dpr, 0, 0);
+      if (fieldContext && field) {
+        const fieldRect = fieldCanvas.getBoundingClientRect();
+        fieldWidth = Math.max(1, fieldRect.width);
+        fieldHeight = Math.max(1, fieldRect.height);
+        fieldCanvas.width = Math.round(fieldWidth * dpr);
+        fieldCanvas.height = Math.round(fieldHeight * dpr);
+        fieldContext.setTransform(dpr, 0, 0, dpr, 0, 0);
+        const size = Math.min(width, height) * 0.9;
+        const quietZones = Array.from(canvas.closest('.home')?.querySelectorAll('.welcome-copy, .home-label') ?? []).map(element => {
+          const box = element.getBoundingClientRect();
+          return { x: box.left - fieldRect.left, y: box.top - fieldRect.top, width: box.width, height: box.height };
+        });
+        fieldGroups = buildFieldParticles(field, { x: 0, y: 0, width: fieldWidth, height: fieldHeight }, {
+          x: rect.left - fieldRect.left + (width - size) / 2,
+          y: rect.top - fieldRect.top + (height - size) / 2,
+          width: size, height: size,
+        }, quietZones, fieldWidth < 900 ? 8500 : 18000);
+        fieldCanvas.dataset.particles = String(fieldGroups.reduce((count, group) => count + group.points.length, 0));
+        lastFieldFrame = 0;
+      }
       wake();
     };
     const locate = (event: PointerEvent) => {
@@ -205,12 +237,16 @@ export function ImageParticles({ src, paused, exposure = 1, dotScale = 1 }: {
     image.onload = () => {
       if (!alive) return;
       try {
-        groups = sampleImage(image, exposure);
+        const sampled = sampleImage(image, exposure);
+        groups = sampled.groups;
+        field = sampled.field;
         if (!groups.length) throw new Error('No visible image samples');
         canvas.dataset.particles = String(groups.reduce((total, group) => total + group.particles.length, 0));
         resize();
         setState('ready');
       } catch {
+        groups = [];
+        fieldGroups = [];
         setState('fallback');
       }
     };
@@ -220,6 +256,9 @@ export function ImageParticles({ src, paused, exposure = 1, dotScale = 1 }: {
     wakeRef.current = wake;
     const resizeObserver = new ResizeObserver(resize);
     resizeObserver.observe(canvas);
+    resizeObserver.observe(fieldCanvas);
+    const copy = canvas.closest('.home')?.querySelector('.welcome-copy');
+    if (copy) resizeObserver.observe(copy);
     const intersectionObserver = new IntersectionObserver(([entry]) => {
       visible = entry.isIntersecting;
       if (visible) wake();
@@ -228,7 +267,7 @@ export function ImageParticles({ src, paused, exposure = 1, dotScale = 1 }: {
         frameId = 0;
       }
     });
-    intersectionObserver.observe(canvas);
+    intersectionObserver.observe(fieldCanvas);
     window.addEventListener('pointermove', locate, { passive: true });
     window.addEventListener('pointerdown', onDown, { passive: true });
     window.addEventListener('pointerup', onUp, { passive: true });
@@ -254,8 +293,11 @@ export function ImageParticles({ src, paused, exposure = 1, dotScale = 1 }: {
 
   return (
     <div className="image-particles" data-state={state}>
-      {state === 'fallback' ? <Burst paused={paused} /> : null}
-      <canvas ref={canvasRef} />
+      <canvas className="image-atmosphere" ref={fieldCanvasRef} />
+      <div className="image-particles-art">
+        {state === 'fallback' ? <Burst paused={paused} /> : null}
+        <canvas className="image-object" ref={canvasRef} />
+      </div>
     </div>
   );
 }

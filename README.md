@@ -28,6 +28,16 @@ Run `npm run build` to type-check the project and generate the static site in `d
 
 The greeting updates while the page stays open. Motion respects the system's reduced-motion preference and stops while the page is hidden. Particle canvases are capped at 2× device pixel ratio. Point colors are grouped to reduce drawing overhead.
 
+### Image-derived atmosphere
+
+The four image scenes share a full-page field of points and short flowing lines. `imageField.ts` extracts a palette from the same image pixels used by `ImageParticles`. Its alpha mask provides the silhouette, including holes and concave edges. Nearest-sample propagation approximates distance to that silhouette, rather than the rectangular image bounds.
+
+Outside the object, coherent waves carry its palette. Within 20% of the displayed image size from the silhouette, color blends toward a locally blurred continuation of the image. Blur operates on premultiplied RGB and alpha, then normalizes color, so transparent pixels cannot introduce a black fringe. Particle motion and line length diminish toward the contour. Opaque image regions suppress the atmospheric layer and retain the original detailed image particles.
+
+The atmosphere and object become visible together after the chosen source loads. Header and copy regions soften the field to retain legibility, including on the shared authentication pages. Geometry is prepared on load and resize; the field updates at up to 30 fps while the object's pointer response retains its existing frame rate. The atmospheric budget is capped at 18,000 points on desktop and 8,500 on narrow layouts. No additional dependency, image asset, or WebGL requirement is introduced.
+
+Run `npm run check:field` for silhouette, concavity, color-continuation, transparent-pixel, deterministic-grain, particle-budget, motion-falloff, and text-region checks.
+
 Home and the greeting share one left alignment inside a fixed-width content frame. The text and artwork columns no longer depend on the greeting's length. All six scenes retain the same layout footprint, with individual optical scale and position adjustments. Waves extend across the page behind the same fixed text anchor. On mobile, the text and artwork form one closely spaced stack; the greeting stays on one line.
 
 To try another object, pass a local transparent image URL to `ImageParticles`. A well-lit silhouette and distinct highlights work best. While the chosen image or Waves module loads, its space stays clear so another scene never flashes first. Image loading or sampling failures show Burst instead of an empty scene. There is no public upload interface.

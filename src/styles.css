@@ -92,14 +92,25 @@ body { margin: 0; }
 .background[data-scene="alpine"] { --art-scale: 1.16; --art-x: -6%; }
 .background[data-scene="portal"] { --art-scale: 1.12; --art-x: -5%; }
 .background[data-scene="burst"] { --art-scale: 1.12; --art-x: -7%; }
-.image-particles, .burst-scene {
+.burst-scene {
   position: absolute;
   inset: 0;
   transform: translate(var(--art-x), var(--art-y)) scale(var(--art-scale));
 }
 .image-particles canvas, .burst-scene canvas { display: block; width: 100%; height: 100%; }
-.image-particles:not([data-state="ready"]) > canvas { visibility: hidden; }
-.image-particles > .burst-scene { transform: none; }
+.background[data-image="true"] { position: static; }
+.image-particles { height: 100%; }
+.image-particles-art {
+  position: relative;
+  z-index: 0;
+  width: 100%;
+  height: 100%;
+  transform: translate(var(--art-x), var(--art-y)) scale(var(--art-scale));
+}
+.image-particles .image-atmosphere { position: absolute; inset: 0; pointer-events: none; }
+.image-particles:not([data-state="ready"]) .image-atmosphere,
+.image-particles:not([data-state="ready"]) .image-object { visibility: hidden; }
+.image-particles-art > .burst-scene { transform: none; }
 .burst-fallback { width: 100%; height: 100%; }
 .burst-scene[data-ready="true"] > .burst-fallback { display: none; }
 .burst-scene:not([data-ready="true"]) > canvas { position: absolute; inset: 0; }
