@@ -2,6 +2,8 @@
 
 A minimal personal homepage with a greeting based on the visitor's local time and the line “A place for things I'm building.” A random scene appears on each visit. The page has no scene controls or interaction instructions. Orange is the shared visual accent.
 
+The header links to the private monitoring page at `https://status.prfnv.com/`. Access is restricted by server-side Google authentication.
+
 ## Development
 
 Use Node.js 20.19 or later in the 20.x release line, or Node.js 22.12 or later.

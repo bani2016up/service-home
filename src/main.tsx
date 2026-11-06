@@ -38,6 +38,7 @@ function Home() {
       <header className="home-label">
         <span className="home-mark" aria-hidden="true"><i /><i /><i /><i /></span>
         Home
+        <a className="status-link" href="https://status.prfnv.com/">Status</a>
       </header>
       <main className="welcome">
         <div className="welcome-copy">
