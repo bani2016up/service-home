@@ -38,13 +38,18 @@ body { margin: 0; }
 .home-mark { display: grid; grid-template-columns: repeat(2, 4px); gap: 2px; }
 .home-mark i { height: 4px; background: #9e9b97; }
 .home-mark i:last-child { background: #4c4a47; }
+.service-links {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-left: auto;
+}
 .status-link {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   min-width: 64px;
   min-height: 44px;
-  margin-left: auto;
   color: inherit;
   text-decoration: underline;
   text-underline-offset: 4px;

@@ -38,7 +38,10 @@ function Home() {
       <header className="home-label">
         <span className="home-mark" aria-hidden="true"><i /><i /><i /><i /></span>
         Home
-        <a className="status-link" href="https://status.prfnv.com/">Status</a>
+        <nav className="service-links" aria-label="Services">
+          <a className="status-link" href="https://youtrack.prfnv.com/">YouTrack</a>
+          <a className="status-link" href="https://status.prfnv.com/">Status</a>
+        </nav>
       </header>
       <main className="welcome">
         <div className="welcome-copy">

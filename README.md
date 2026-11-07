@@ -2,7 +2,7 @@
 
 A minimal personal homepage with a greeting based on the visitor's local time and the line “A place for things I'm building.” A random scene appears on each visit. The page has no scene controls or interaction instructions. Orange is the shared visual accent.
 
-The header links to the private monitoring page at `https://status.prfnv.com/`. Access is restricted by server-side Google authentication.
+The header links to YouTrack at `https://youtrack.prfnv.com/` and the private monitoring page at `https://status.prfnv.com/`. Access to both services is restricted by server-side Google authentication.
 
 The authentication pages live in `auth-required.html`, `auth-denied.html`, and `auth-error.html`. They share the homepage's styles and `Background` component, including random scenes, animation, and reduced-motion handling. Their text and sign-in links remain usable without JavaScript.
 
